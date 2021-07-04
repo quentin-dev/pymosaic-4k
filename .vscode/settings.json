@@ -1,0 +1,7 @@
+{
+    "restructuredtext.confPath": "",
+    "python.analysis.extraPaths": [
+        "pymosaic_4k",
+        "tests"
+      ]
+}
