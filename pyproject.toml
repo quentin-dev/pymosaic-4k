@@ -5,7 +5,7 @@ description = "Create 4K mosaics"
 authors = ["Quentin Barbarat <quentin.barbarat@epita.fr>"]
 
 [tool.poetry.dependencies]
-python = "^3.8.5"
+python = "3.8.5"
 Pillow = "^8.3.0"
 typer = "^0.3.2"
 fastapi = "^0.66.0"
