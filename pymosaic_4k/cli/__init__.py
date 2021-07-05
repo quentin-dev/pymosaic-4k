@@ -16,5 +16,5 @@ def create_mosaic(filename: str, folder: str):
         )
         raise typer.Exit(code=1)
 
-    image = mosaic_logic.create_mosaic(folder=folder)
+    image = mosaic_logic.create_mosaic_from_folder(folder=folder)
     mosaic_logic.save_mosaic(filename=filename, mosaic=image)
