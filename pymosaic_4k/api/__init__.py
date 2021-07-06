@@ -1,13 +1,10 @@
 import os
-from io import BytesIO
-from tempfile import NamedTemporaryFile, gettempdir
+from tempfile import NamedTemporaryFile
 from typing import List
 
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.background import BackgroundTasks
-from fastapi.responses import FileResponse, HTMLResponse, Response
-from PIL.Image import Image as ImageType
-from starlette.responses import StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse
 
 from pymosaic_4k.logic import mosaic as mosaic_logic
 
@@ -20,12 +17,16 @@ def _remove_tmp_file(path: str) -> None:
 
 @app.post("/mosaic/create")
 async def create_mosaic(
-    background_tasks: BackgroundTasks, files: List[UploadFile] = File(...)
+    background_tasks: BackgroundTasks,
+    files: List[UploadFile] = File(...),
+    resize: bool = Form(False),
 ):
-    image = mosaic_logic.create_mosaic_from_files([file.file for file in files])
+    mosaic = mosaic_logic.create_mosaic_from_files(
+        files=[file.file for file in files], resize=resize
+    )
 
     with NamedTemporaryFile(suffix=".png", delete=False) as response_file:
-        image.save(response_file, format="png")
+        mosaic.save(response_file, "PNG")
         background_tasks.add_task(_remove_tmp_file, response_file.name)
         return FileResponse(
             response_file.name,
@@ -40,8 +41,14 @@ async def main():
     content = """
 <body>
 <form action="/mosaic/create" enctype="multipart/form-data" method="post">
-<input name="files" type="file" multiple>
-<input type="submit">
+    <div>
+        <input name="files" type="file" multiple>
+        <input name="resize" id="resize" type="checkbox" checked>
+        <label for="resize">Resize images</label>
+    </div>
+    <div>
+        <input type="submit">
+    </div>
 </form>
 </body>
     """

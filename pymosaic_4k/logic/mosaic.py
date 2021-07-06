@@ -28,19 +28,27 @@ def _create_mosaic_from_stamps(stamps: List[ImageType]) -> ImageType:
     return mosaic
 
 
-def create_mosaic_from_folder(folder: str) -> Image:
+def create_mosaic_from_folder(folder: str, resize: bool) -> Image:
     stamps = []
 
-    for image in os.listdir(folder):
-        filepath = os.path.join(folder, image)
-        stamps.append(Image.open(filepath, "r"))
+    for file in os.listdir(folder):
+        filepath = os.path.join(folder, file)
+        image = Image.open(filepath, "r")
+        stamps.append(image.resize((STAMP_WIDTH, STAMP_HEIGHT)) if resize else image)
 
     return _create_mosaic_from_stamps(stamps=stamps)
 
 
-def create_mosaic_from_files(files: List[SpooledTemporaryFile]) -> ImageType:
+def create_mosaic_from_files(
+    files: List[SpooledTemporaryFile], resize: bool
+) -> ImageType:
 
-    stamps = [Image.open(file) for file in files]
+    stamps = [
+        Image.open(file).resize((STAMP_WIDTH, STAMP_HEIGHT))
+        if resize
+        else Image.open(file)
+        for file in files
+    ]
 
     return _create_mosaic_from_stamps(stamps=stamps)
 
